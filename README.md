@@ -1,7 +1,12 @@
-# Installation instructions for Spring 2022 CS3110 Final Project: Gravity Simulator
+# Intoduction 
+Program by Michael Fragano
 
-Here are instructions for installing and running our CS3110 Final Project, 
-a Gravity Simulator on Windows using WSL.
+This is a 3D N-Body simulator based off of the 2D N-body simulator I made with Seth Norman, and the 3D renderer I made.
+
+
+# Installation instructions for 3DGravity Simulator
+
+Here are instructions for installing and running the 3D Gravity simulator on Windows using WSL.
 
 These instructions assume that WSL and OCaml were installed using the 
 instructions provided in the CS3110 textbook. These can be found at
@@ -135,35 +140,26 @@ can exit the program by typing `Q`.
 
 Once the simulation is running the following buttons have these effects:
 
-Space Bar: Toggle through different views -your current focus will be typed in 
-           the bottom left corner.
 Click: play/pause the simulation
 `<`: Slow down the simulation
 `>`: Speed up the simulation
-`s`: Zoom out
-`w`: Zoom in 
+`w`: Move in the +y direction
+`s`: Move in the -y direction
+`d`: Move in the +x direction
+`a`: Move in the -x direction
+Space Bar: Move in the +z direction
+`z`: Move in the -z direction
+
+`i` : rotate in the +x direction
+`k` : rotate in the -x direction
+`j` : rotate in the +z direction
+`l` : rotate in the -z direction
+`o` : rotate in the +y direction
+`u` : rotate in the -y direction
+
+`1` : zoom in
+`2` : zoom out
+
 `q`: Quit the simulation
 
-To create a system from scratch, type `new`. You will then be prompted to input 
-how many seconds you want the steps of the simulation to be (smaller is more 
-accurate, we find 0.001 works well), and and what you want to set the 
-gravitational constant as (1000 usually works well). After this a window will 
-open. To create bodies, click once to set a postion, click again to set 
-radius/mass, then once more to set velocity. When setting radius, press the 
-space bar to skip velocity, setting it to the default of zero. 
-
-If you want to delete a body, place the mouse over the body you wish to delete,
-and press `d`
-
-Once you have created your bodies, press `k` to run a simulation. 
-
-If you want to save your system to run later, press `s`, and you will be 
-prompted to give a name to the system. Once you give this, it will be saved as 
-a json file. Just use the name to run your system whenever you like. 
-
-Press `q` to quit the editor. 
-
-If you want to edit a preset system, type `edit`, you will then be prompted
-to input the name of the system you wish to edit. Type that in to edit your
-desired system. 
 
