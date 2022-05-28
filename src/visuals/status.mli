@@ -5,14 +5,6 @@ type input_state =
   | Released
   | Unmonitored
 
-(** create_state is the current variable being edited for the system.
-    Either the location of a new body, the size of an already placed
-    body, or the velocity of an alcready placed body. *)
-type create_state =
-  | Location
-  | Size
-  | Velocity
-  | Delete
 
 type t
 
@@ -48,16 +40,6 @@ val play : t -> t
 val toggle_pause : t -> t
 (** [toggle_pause status] toggles the paused flag*)
 
-val new_cstate : t -> t
-(** [new_cstate status] updates the create state to the next state.*)
-
-val reset_cstate : t -> t
-(** [reset_cstate status] updates the create_state to the Location
-    state.*)
-
-val cdelete : t -> t
-(** [celete status] updates the create_state to the Delete state, if the
-    state is currently in the Location state.*)
 
 val update_speed : bool -> t -> t
 (** [update_speed f status] doubles the speed of the system playback if
@@ -70,8 +52,6 @@ val update_body_num : Gravity.system -> t -> t
 val mouse_state : t -> input_state
 (** [mouse_state status] returns the current state of the mouse*)
 
-val create_state : t -> create_state
-(** create_state status] returns the current create state of the system*)
 
 val key_state : char -> t -> input_state
 (** [key_state c status] returns the current state of the key [c]*)
@@ -92,18 +72,3 @@ val is_paused : t -> bool
 
 val speed : t -> float
 (** [speed status] returns the current speed of the system*)
-
-val show_paths : t -> bool
-(** [show_paths status] returns if the paths should be shown on the
-    screen*)
-
-val paths : t -> Paths.t
-(** [paths status] returns the list of paths to be shown on the screen*)
-
-val update_paths : Gravity.system -> t -> t
-(** [update_paths system status] updates the paths in [status] based on
-    the state of [system] *)
-
-val toggle_paths : t -> t
-(** [toggle_paths t] toggles whether the paths should be shown on the
-    screen *)

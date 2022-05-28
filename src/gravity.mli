@@ -25,22 +25,22 @@ val from_json : Yojson.Basic.t -> system
 val to_json : system -> Yojson.Basic.t
 (** to_json s] is the Yojson.Basic.t that represents [s] *)
 
-val make_g : float -> float -> g_field
-(** [make_g h v] creates a g_field from two floats [h](horizontal) and
-    [v](vertical)*)
+val make_g : float -> float -> float -> g_field
+(** [make_g a b c] creates a g_field from three floats [a](x),
+    [b](y), and [c](z)*)
 
-val make_v : float -> float -> velocity
-(** [make_v v] creates a new velocity from two floats [h](horizontal)
-    and [v](vertical)*)
+val make_v : float -> float -> float  -> velocity
+(** [make_v a b c] creates a new velocity from three floats [a](x),
+    [b](y), and [c](z)*)
 
 val make_b : position -> velocity -> float -> int -> bool -> body
 (** [make_b p v m c cr] creates a new body from position [p], velocity
     [v], mass [m], and color [c], with a bool for if it is in the
     process of being created by the creator.*)
 
-val make_p : float -> float -> position
-(** [make_p h v] creates a new velocity from two floats [h](horizontal)
-    and [v](vertical)*)
+val make_p : float -> float -> float -> position
+(** [make_p a b c] creates a new velocity from three floats [a](x),
+    [b](y), and [c](z)*)
 
 val make_s : float -> float -> body list -> system
 (** [make_s t gr b] creates a new system from dt [t], gravitational

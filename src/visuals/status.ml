@@ -5,12 +5,6 @@ type input_state =
   | Released
   | Unmonitored
 
-type create_state =
-  | Location
-  | Size
-  | Velocity
-  | Delete
-
 type t = {
   mouse_state : input_state;
   key_states : (char * input_state) list;
@@ -18,9 +12,6 @@ type t = {
   paused : bool;
   body_num : int;
   speed : float;
-  show_paths : bool;
-  paths : Paths.t;
-  cstate : create_state;
 }
 
 let default () =
@@ -43,9 +34,6 @@ let default () =
     paused = false;
     body_num = 0;
     speed = 1.;
-    show_paths = true;
-    paths = Paths.create ();
-    cstate = Location;
   }
 
 let update_input is_down = function
@@ -53,16 +41,6 @@ let update_input is_down = function
   | Pressed -> if is_down then Held else Released
   | Held -> if is_down then Held else Released
   | Released | Unmonitored -> if is_down then Pressed else Idle
-
-let update_cstate = function
-  | Location -> Size
-  | Size -> Velocity
-  | Velocity -> Location
-  | Delete -> Location
-
-let delete_cstate = function
-  | Location -> Delete
-  | a -> a
 
 let update_mouse state = update_input (Graphics.button_down ()) state
 
@@ -103,13 +81,6 @@ let pause status = { status with paused = true }
 let play status = { status with paused = false }
 let toggle_pause status = { status with paused = not status.paused }
 
-let new_cstate status =
-  { status with cstate = update_cstate status.cstate }
-
-let reset_cstate status = { status with cstate = Location }
-
-let cdelete status =
-  { status with cstate = delete_cstate status.cstate }
 
 let update_speed f status =
   if f = true then { status with speed = status.speed *. 2. }
@@ -127,7 +98,6 @@ let update_body_num system status =
   }
 
 let mouse_state status = status.mouse_state
-let create_state status = status.cstate
 
 let key_state c status =
   match List.assoc_opt c status.key_states with
@@ -139,11 +109,3 @@ let bind_key key state f s = if key_state key s = state then f s else s
 let camera_focus status = status.camera_focus
 let is_paused status = status.paused
 let speed status = status.speed
-let show_paths status = status.show_paths
-let paths status = status.paths
-
-let update_paths system status =
-  { status with paths = Paths.update system status.paths }
-
-let toggle_paths status =
-  { status with show_paths = not status.show_paths }

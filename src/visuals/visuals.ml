@@ -40,21 +40,14 @@ let rec draw_bodies camera clear = function
             (Camera.to_window_scale camera (Gravity.rad h));
           draw_bodies camera clear t)
 
-let rec draw_paths camera clear paths =
-  (if clear then Paths.clear else Paths.draw) camera paths
-
 let clear_screen camera system status =
-  draw_bodies camera true (Gravity.bods system);
-  if Status.show_paths status then
-    draw_paths camera true (Status.paths status)
+  draw_bodies camera true (Gravity.bods system)
 
 let render
     (camera : Camera.t)
     (system : Gravity.system)
     (status : Status.t) : unit =
   draw_bodies camera false (Gravity.bods system);
-  if Status.show_paths status then
-    draw_paths camera false (Status.paths status);
   draw_focus status;
   synchronize ();
   clear_screen camera system status
@@ -67,12 +60,8 @@ let update_status (status : Status.t) (system : Gravity.system) :
   |> Status.bind_key ' ' Pressed Status.cycle_focus
   |> Status.bind_key ',' Pressed (Status.update_speed false)
   |> Status.bind_key '.' Pressed (Status.update_speed true)
-  |> Status.bind_key 'p' Pressed Status.toggle_paths
   |> Status.bind_key 'q' Pressed (fun _ ->
          raise @@ Graphics.Graphic_failure "Quit Window")
-
-let update_paths (system : Gravity.system) (status : Status.t) =
-  Status.update_paths system status
 
 let seconds_per_frame : float = 1. /. 60.
 
@@ -139,7 +128,7 @@ let rec main_loop
     else update_system system status
   in
   let new_status =
-    update_status status new_system |> update_paths new_system
+    update_status status new_system
   in
   let new_camera = adjust camera new_system new_status in
   let new_time = Unix.gettimeofday () in
