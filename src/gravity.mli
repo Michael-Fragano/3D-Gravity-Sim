@@ -69,10 +69,13 @@ val velocity : body -> velocity
 (** [velocity b] returns the velocity of body [b]*)
 
 val x_vel : body -> float
-(** [velocity b] returns the x velocity of body [b]*)
+(** [x_vel b] returns the x velocity of body [b]*)
 
 val y_vel : body -> float
-(** [velocity b] returns the y velocity of body [b]*)
+(** [y_vel b] returns the y velocity of body [b]*)
+
+val z_vel : body -> float
+(** [z_vel b] returns the z velocity of body [b]*)
 
 val create : body -> bool
 (** [create b] returns if body [b] is in the create stage.*)
@@ -89,6 +92,10 @@ val y_dist : body -> body -> float
 (** [y_dist a b] returns the y component of the distance of body [b]
     from body [a]*)
 
+val z_dist : body -> body -> float 
+(** [z_dist a b] returns the z component of the distance of body [b]
+    from body [a]*)
+
 val dist : body -> body -> float
 (** [dist_sq a b] is the the distance between two bodies [a] and [b]*)
 
@@ -102,6 +109,9 @@ val gx : g_field -> float
 val gy : g_field -> float
 (** [gy g] returns y component of g_field [g]*)
 
+val gz : g_field -> float
+(** [gz g] returns z component of g_field [g]*)
+
 val acc : float -> float -> float
 (** [acc f m ] returns the acceleration of a force [f] and a mass [m]*)
 
@@ -110,6 +120,18 @@ val x_pos : body -> float
 
 val y_pos : body -> float
 (** [y_pos b] returns the y position of body [b]*)
+
+val z_pos : body -> float
+(** [z_pos b] returns the z position of body [b]*)
+
+val px : position -> float
+(**[px p] returns the x position of position [p]*)
+
+val py : position -> float
+(**[py p] returns the y position of position [p]*)
+
+val pz : position -> float
+(**[pz p] returns the z position of position [p]*)
 
 val pos : body -> position
 (** [pos b] returns the position of body [b]*)

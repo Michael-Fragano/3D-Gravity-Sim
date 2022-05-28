@@ -1,37 +1,38 @@
-(** This type represents what the camera should focus on in a system. *)
-type focus =
-  | Origin
-  | Body of int
-  | Free
-  | CenterOfMass
 
-type t
-(** This type represents a camera that translates system space to screen
-    space *)
 
-val default : t
-(** Returns a camera initialized with default values (centered on middle
-    of window) *)
+type camera
+(**Camera object, has a set position, rotation, and field of view.*)
 
-val set_scale : float -> t -> t
-(** [set_scale sx sy cam] updates [cam] with new [sx] and [sy] values. 1
-    is the default value *)
+type position
+ 
+type rotation
 
-val zoom : float -> t -> t
-(** [zoom k cam] is [cam] zoomed in by a factor of [k] *)
+val set_camera : position -> rotation -> float -> camera
+(**Set the position, rotation, and field of view of the camera.*)
 
-val set_pos : float -> float -> t -> t
-(** [set_pos x y cam] centers the camera on ([x], [y]) in the system
-    space *)
+val set_all_camera : float -> float -> float -> float -> float -> float -> float -> camera
+(**Set the position, rotation, and field of view of the camera from floats for x y z position and x y z rotation.*)
 
-val move : float -> float -> t -> t
-(** [move x y cam] is [cam] moved horizontally by [x] and vertically by
-    [y] *)
+val default_camera : camera
+(**Creates camera object at point (0, 0, 0) and rotation (0, 0, 0) with FOV of 60 degrees.*)
 
-val to_window : t -> float -> float -> int * int
-(** [to_window cam x y] returns a tuple representing the window
-    coordinates of the point ([x], [y]) in the system space *)
+val camposx : camera -> float
+(**[camposx c] returns the x position of camera [c]*)
 
-val to_window_scale : t -> float -> int
-(** [to_window_scale s] returns the value transformed to the window
-    coordinates without translation *)
+val camposy : camera -> float
+(**[camposy c] returns the y position of camera [c]*)
+
+val camposz : camera -> float
+(**[camposz c] returns the z position of camera [c]*)
+
+val camrotx : camera -> float
+(**[camrotx c] returns the x rotation of camera [c]*)
+
+val camroty : camera -> float
+(**[camroty c] returns the y rotation of camera [c]*)
+
+val camrotz : camera -> float
+(**[camrotz c] returns the z rotation of camera [c]*)
+
+val camfov : camera -> float
+(**[camfov c] returns the field of view of camera [c]*)

@@ -1,37 +1,50 @@
-type focus =
-  | Origin
-  | Body of int
-  | Free
-  | CenterOfMass
-
-type t = {
-  dx : float;
-  dy : float;
-  s : float;
+type position = {
+  x : float;
+  y : float;
+  z : float;
 }
-(** (dx, dy) is the point in the system space that the camera is
-    centered over. s is the distance that map to 1 pixel in the window. *)
 
-let default : t = { dx = 0.; dy = 0.; s = 1. }
-let set_scale (s : float) (cam : t) : t = { cam with s }
-let zoom (k : float) (cam : t) : t = set_scale (cam.s *. k) cam
+type rotation = {
+  x : float;
+  y : float; 
+  z : float;
+}
 
-let set_pos (dx : float) (dy : float) (cam : t) : t =
-  { cam with dx; dy }
+type camera = {
+  pos : position;
+  rot : rotation;
+  fov : float
+}
 
-let move (dx : float) (dy : float) (cam : t) : t =
-  set_pos (cam.dx +. dx) (cam.dy +. dy) cam
+let set_camera p r f : camera=
+  {
+    pos = p;
+    rot = r;
+    fov = f
+  }
 
-(** [center (x, y)] returns a tuple with [x] and [y] translated such
-    that the origin is the center of the window, instead of the lower
-    left corner *)
-let center ((x, y) : int * int) : int * int =
-  (x + (Graphics.size_x () / 2), y + (Graphics.size_y () / 2))
+let set_all_camera x y z xr yr zr f : camera =
+  {
+    pos = {x = x; y = y; z = z};
+    rot = {x = xr; y = yr; z = zr};
+    fov = f
+  }
 
-let to_window (cam : t) (x : float) (y : float) : int * int =
-  center
-    ( int_of_float @@ ((x -. cam.dx) /. cam.s),
-      int_of_float @@ ((y -. cam.dy) /. cam.s) )
+(**Rotation (0, 0, 0) faces the camera in the +y direction*)
+let default_camera : camera =
+  {
+    pos = {x = 0.; y = -1000.; z = 0.};
+    rot = {x = 0.; y = 0.; z = 0.};
+    fov = 1.0472
+  }
 
-let to_window_scale (cam : t) (s : float) : int =
-  int_of_float @@ Float.ceil @@ (s /. cam.s)
+  let camposx cam : float = cam.pos.x
+  let camposy cam : float = cam.pos.y
+  let camposz cam : float = cam.pos.z
+
+  let camrotx cam : float = cam.rot.x
+
+  let camroty cam : float = cam.rot.y
+  let camrotz cam : float = cam.rot.z
+
+  let camfov cam : float = cam.fov

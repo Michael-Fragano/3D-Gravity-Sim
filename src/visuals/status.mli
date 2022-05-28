@@ -25,12 +25,6 @@ val keys_down : unit -> char list
 val poll_input : t -> t
 (** updates the key states based on which keys are down*)
 
-val change_focus : t -> Camera.focus -> t
-(** [change_focus status focus] updates [status] with new focus [focus]*)
-
-val cycle_focus : t -> t
-(** [cycle_focus status] cycles to the next focus for the status*)
-
 val pause : t -> t
 (** [pause status] sets the paused flag for the status*)
 
@@ -63,9 +57,6 @@ val bind_mouse : input_state -> (t -> t) -> t -> t
 val bind_key : char -> input_state -> (t -> t) -> t -> t
 (** [bind_mouse c state f status] returns [f status] if [state] matches
     [key_state c status]. Otherwise returns [status] *)
-
-val camera_focus : t -> Camera.focus
-(** [camera_focus status] is the current focus of the camera*)
 
 val is_paused : t -> bool
 (** [is_paused status] returns true if the system is paused*)

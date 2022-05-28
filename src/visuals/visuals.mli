@@ -4,7 +4,7 @@
 val start_window : unit -> unit
 (** Final starting program. Will open window with full gui*)
 
-val main_loop : Camera.t -> Gravity.system -> Status.t -> float -> unit
+val main_loop : Camera.camera -> Gravity.system -> Status.t -> float -> unit
 (** [main_loop camera system status time] starts the main rendering loop
     for gravity*)
 

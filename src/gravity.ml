@@ -121,6 +121,8 @@ let velocity b = b.vel
 let x_vel b = b.vel.x
 let y_vel b = b.vel.y
 
+let z_vel b = b.vel.z
+
 let create b = b.create
 
 let rec bodies_ex bds (b : body) =
@@ -142,9 +144,17 @@ let dist a b =
 let grav_force g a b = g *. (a.mass *. b.mass /. (dist a b *. dist a b))
 let gx g = g.x
 let gy g = g.y
+
+let gz g = g.z
 let acc f m = f /. m
 let x_pos b = b.pos.x
 let y_pos b = b.pos.y
+
+let z_pos b = b.pos.z
+
+let px (p : position) = p.x
+let py (p : position) = p.y
+let pz (p : position) = p.z
 
 let pos b = b.pos
 let color b = b.color

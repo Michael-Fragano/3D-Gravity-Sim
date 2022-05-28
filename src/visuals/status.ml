@@ -8,7 +8,6 @@ type input_state =
 type t = {
   mouse_state : input_state;
   key_states : (char * input_state) list;
-  camera_focus : Camera.focus;
   paused : bool;
   body_num : int;
   speed : float;
@@ -30,7 +29,6 @@ let default () =
         ('w', Idle);
       ];
     (* we can add any number of other keys here ^ *)
-    camera_focus = Origin;
     paused = false;
     body_num = 0;
     speed = 1.;
@@ -66,17 +64,6 @@ let poll_input (status : t) : t =
         status.key_states;
   }
 
-let change_focus status focus = { status with camera_focus = focus }
-
-let cycle_focus status =
-  match status.camera_focus with
-  | Origin -> change_focus status (Body 0)
-  | Body n ->
-      if n + 1 < status.body_num then change_focus status (Body (n + 1))
-      else change_focus status CenterOfMass
-  | CenterOfMass -> change_focus status Origin
-  | Free -> change_focus status Origin
-
 let pause status = { status with paused = true }
 let play status = { status with paused = false }
 let toggle_pause status = { status with paused = not status.paused }
@@ -91,10 +78,6 @@ let update_body_num system status =
   {
     status with
     body_num = new_num;
-    camera_focus =
-      (match status.camera_focus with
-      | Body n -> if n >= new_num then Body 0 else Body n
-      | f -> f);
   }
 
 let mouse_state status = status.mouse_state
@@ -106,6 +89,5 @@ let key_state c status =
 
 let bind_mouse state f s = if mouse_state s = state then f s else s
 let bind_key key state f s = if key_state key s = state then f s else s
-let camera_focus status = status.camera_focus
 let is_paused status = status.paused
 let speed status = status.speed

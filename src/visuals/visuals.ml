@@ -12,39 +12,77 @@ let rec draw_coords status =
     (Printf.sprintf "x : %n, y : %n" status.mouse_x status.mouse_y);
   draw_coords (wait_next_event [ Mouse_motion ])
 
+
+  let rel_pos (camera : Camera.camera) (body : Gravity.body) = (
+    let ccosx = cos (-.Camera.camrotx camera) in
+  let csinx = sin (-.Camera.camrotx camera) in
+  let ccosy = cos (-.Camera.camroty camera) in
+  let csiny = sin(-.Camera.camroty camera) in
+  let ccosz = cos (-.Camera.camrotz camera) in
+  let csinz = sin (-.Camera.camrotz camera) in
+
+    (**Find position relative to camera's global positioin*)
+    let cpos = Gravity.make_p (Gravity.x_pos body -. Camera.camposx camera) (Gravity.y_pos body -. Camera.camposy camera) (Gravity.z_pos body -. Camera.camposz camera) in
+  
+    (**Find position relative to camera's rotation*)
+    let crotx = Gravity.make_p (Gravity.px cpos) (Gravity.py cpos *. ccosx -. Gravity.pz cpos *. csinx) (Gravity.pz cpos *. ccosx +. Gravity.py cpos  *. csinx) in
+    let croty = Gravity.make_p (Gravity.px crotx *. ccosy -. Gravity.pz crotx *. csiny) (Gravity.py crotx) (Gravity.pz crotx *. ccosy +. Gravity.px crotx *. csiny) in
+    Gravity.make_p (Gravity.px croty *. ccosz -. Gravity.py croty *. csinz) (Gravity.py croty *. ccosz +. Gravity.px croty *. csinz) (Gravity.pz croty)
+  )
+  
+
+
+
 let draw_focus (status : Status.t) =
   moveto 0 0;
   set_color background;
   fill_rect 0 0 (size_x ()) 10;
   set_color black;
-  let focus_str =
-    match Status.camera_focus status with
-    | Origin -> "Origin"
-    | Body n -> "Body " ^ string_of_int n
-    | CenterOfMass -> "Center Of Mass"
-    | Free -> "Free"
-  in
-  draw_string (Printf.sprintf "focus : " ^ focus_str);
   draw_string (Printf.sprintf "  speed : %f" (Status.speed status))
 
-let rec draw_bodies camera clear = function
+let pdist x1 y1 z1 x2 y2 z2=
+  let x = x2 -. x1 in
+  let y = y2 -. y1 in
+  let z = z2 -. z1 in 
+  sqrt ((x *. x) +. (y *. y) +. (z *. z)) 
+  
+let rec sortbods c sorted bodies :  Gravity.body list =
+  let rec sort (sorted : Gravity.body list) b =
+    match sorted with
+    | [] -> [b]
+    | [h] -> if ((pdist (Camera.camposx c) (Camera.camposy c) (Camera.camposz c) (Gravity.x_pos b) (Gravity.y_pos b)  (Gravity.z_pos b)) > (pdist (Camera.camposx c) (Camera.camposy c) (Camera.camposz c) (Gravity.x_pos h) (Gravity.y_pos h) (Gravity.z_pos h))) then [b; h] else [h; b]
+    | h :: t -> if ((pdist (Camera.camposx c) (Camera.camposy c) (Camera.camposz c) (Gravity.x_pos b) (Gravity.y_pos b)  (Gravity.z_pos b)) > (pdist (Camera.camposx c) (Camera.camposy c) (Camera.camposz c) (Gravity.x_pos h) (Gravity.y_pos h) (Gravity.z_pos h))) then [b; h] @ t else h :: sort t b
+  in
+  match bodies with
+  | [] -> sorted
+  | h :: t -> sortbods c (sort sorted h) t
+
+let rec draw_bodies camera clear bodies = 
+  let sbods = sortbods camera [] bodies in
+  match sbods with
   | [] -> ()
   | h :: t -> (
       if clear then set_color background
       else set_color (Gravity.color h);
-      match
-        Camera.to_window camera (Gravity.x_pos h) (Gravity.y_pos h)
-      with
-      | x, y ->
-          fill_circle x y
-            (Camera.to_window_scale camera (Gravity.rad h));
+      let maxr = (Camera.camfov camera /. 2.) in
+      let rpos = rel_pos camera h in
+      if Gravity.py rpos < 0. then  
+        draw_bodies camera clear t
+      else 
+      let y = atan (Gravity.pz rpos /. Gravity.py rpos) in
+      let x = atan (Gravity.px rpos/. Gravity.py rpos) in
+      if (y > maxr) || (x > maxr) then
+        draw_bodies camera clear t
+      else
+        fill_circle (int_of_float ((400. *.  (x /. maxr)) +. 400.)) (int_of_float ((400. *.  (y /. maxr)) +. 400.)) (int_of_float (( (800. /. Camera.camfov camera) /. (sqrt ((Gravity.px rpos ** 2. ) +.(Gravity.py rpos ** 2. ) +. (Gravity.pz rpos ** 2. ) ))) *. Gravity.rad h ));
           draw_bodies camera clear t)
 
 let clear_screen camera system status =
   draw_bodies camera true (Gravity.bods system)
 
+
 let render
-    (camera : Camera.t)
+    (camera : Camera.camera)
     (system : Gravity.system)
     (status : Status.t) : unit =
   draw_bodies camera false (Gravity.bods system);
@@ -57,7 +95,6 @@ let update_status (status : Status.t) (system : Gravity.system) :
   status |> Status.poll_input
   |> Status.update_body_num system
   |> Status.bind_mouse Pressed Status.toggle_pause
-  |> Status.bind_key ' ' Pressed Status.cycle_focus
   |> Status.bind_key ',' Pressed (Status.update_speed false)
   |> Status.bind_key '.' Pressed (Status.update_speed true)
   |> Status.bind_key 'q' Pressed (fun _ ->
@@ -74,51 +111,12 @@ let update_system (system : Gravity.system) (status : Status.t) :
 (* <- gives ticks per frame*)
 
 let adjust
-    (camera : Camera.t)
+    (camera : Camera.camera)
     (system : Gravity.system)
-    (status : Status.t) : Camera.t =
-  (match Status.camera_focus status with
-  | Camera.Origin -> Camera.set_pos 0.0 0.0 camera
-  | Camera.Body n ->
-      let b = system |> Gravity.bods |> fun lst -> List.nth lst n in
-      Camera.set_pos (Gravity.x_pos b) (Gravity.y_pos b) camera
-  | CenterOfMass ->
-      let b = Gravity.bods system in
-      let rec bm bods =
-        match bods with
-        | [] -> 0.0
-        | [ n ] -> Gravity.mass n
-        | h :: t -> Gravity.mass h +. bm t
-      in
-      let m = bm b in
-      let cx =
-        let rec bx bods =
-          match bods with
-          | [] -> 0.0
-          | [ n ] -> Gravity.x_pos n *. Gravity.mass n
-          | h :: t -> (Gravity.x_pos h *. Gravity.mass h) +. bx t
-        in
-        if List.length b > 0 then bx b /. m else bx b
-      in
-      let cy =
-        let rec by bods =
-          match bods with
-          | [] -> 0.0
-          | [ n ] -> Gravity.y_pos n *. Gravity.mass n
-          | h :: t -> (Gravity.y_pos h *. Gravity.mass h) +. by t
-        in
-        if List.length b > 0 then by b /. m else by b
-      in
-      Camera.set_pos cx cy camera
-  | _ -> camera)
-  |> (if Status.key_state 'w' status = Pressed then Camera.zoom 0.8
-     else Fun.id)
-  |>
-  if Status.key_state 's' status = Pressed then Camera.zoom 1.25
-  else Fun.id
+    (status : Status.t) : Camera.camera = camera
 
 let rec main_loop
-    (camera : Camera.t)
+    (camera : Camera.camera)
     (system : Gravity.system)
     (status : Status.t)
     (time : float) : unit =
@@ -147,13 +145,13 @@ let start_window_preset json =
   in
   try
     init ();
-    main_loop Camera.default system (Status.default ())
+    main_loop Camera.default_camera system (Status.default ())
       (Unix.gettimeofday ())
   with Graphics.Graphic_failure _ -> Graphics.close_graph ()
 
 let start_window_from_create system =
   try
     init ();
-    main_loop Camera.default system (Status.default ())
+    main_loop Camera.default_camera system (Status.default ())
       (Unix.gettimeofday ())
   with Graphics.Graphic_failure _ -> Graphics.close_graph ()
