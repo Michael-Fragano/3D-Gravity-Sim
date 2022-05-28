@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "properties": {
+    "dt": {
+      "type": "number"
+    },
+    "g": {
+      "type": "number"
+    },
+    "bodies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "velocity": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "mass": {
+            "type": "number"
+          },
+          "color": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "position",
+          "velocity",
+          "mass",
+          "color"
+        ]
+      }
+    }
+  },
+  "required": [
+    "dt",
+    "g",
+    "bodies"
+  ]
+}
