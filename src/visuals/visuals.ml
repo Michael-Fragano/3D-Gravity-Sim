@@ -111,9 +111,23 @@ let update_system (system : Gravity.system) (status : Status.t) :
 (* <- gives ticks per frame*)
 
 let adjust
-    (camera : Camera.camera)
-    (system : Gravity.system)
-    (status : Status.t) : Camera.camera = camera
+    (cam : Camera.camera)
+    (status : Status.t) : Camera.camera = 
+    if (Status.key_state 'a' status = Pressed) || (Status.key_state 'a' status = Held)  then (Camera.set_all_camera (Camera.camposx cam -. 5.) (Camera.camposy cam) (Camera.camposz cam) (Camera.camrotx cam) (Camera.camroty cam) (Camera.camrotz cam) (Camera.camfov cam))
+    else if (Status.key_state 'd' status = Pressed) || (Status.key_state 'd' status = Held)  then Camera.(set_all_camera (camposx cam +. 5.) (camposy cam) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam) (camfov cam))
+    else if (Status.key_state 'w' status = Pressed) || (Status.key_state 'w' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam +. 5.) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam) (camfov cam))
+    else if (Status.key_state 's' status = Pressed) || (Status.key_state 's' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam -. 5.) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam) (camfov cam))
+    else if (Status.key_state ' ' status = Pressed) || (Status.key_state ' ' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam +. 5.) (camrotx cam) (camroty cam) (camrotz cam) (camfov cam))
+    else if (Status.key_state 'z' status = Pressed) || (Status.key_state 'z' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam -. 5.) (camrotx cam) (camroty cam) (camrotz cam) (camfov cam))
+    else if (Status.key_state 'j' status = Pressed) || (Status.key_state 'j' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam +. 0.03) (camfov cam))
+    else if (Status.key_state 'l' status = Pressed) || (Status.key_state 'l' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam -. 0.03) (camfov cam))
+    else if (Status.key_state 'i' status = Pressed) || (Status.key_state 'i' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam +. 0.03) (camroty cam) (camrotz cam ) (camfov cam))
+    else if (Status.key_state 'k' status = Pressed) || (Status.key_state 'k' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam -. 0.03) (camroty cam) (camrotz cam ) (camfov cam))
+    else if (Status.key_state 'u' status = Pressed) || (Status.key_state 'u' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam +. 0.03) (camrotz cam ) (camfov cam))
+    else if (Status.key_state 'o' status = Pressed) || (Status.key_state 'o' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam -. 0.03) (camrotz cam ) (camfov cam))
+    else if (Status.key_state '1' status = Pressed) || (Status.key_state '1' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam ) (camfov cam -. 0.05))
+    else if (Status.key_state '2' status = Pressed) || (Status.key_state '2' status = Held)  then Camera.(set_all_camera (camposx cam) (camposy cam ) (camposz cam) (camrotx cam) (camroty cam) (camrotz cam ) (camfov cam +. 0.05))  
+    else cam
 
 let rec main_loop
     (camera : Camera.camera)
@@ -128,7 +142,7 @@ let rec main_loop
   let new_status =
     update_status status new_system
   in
-  let new_camera = adjust camera new_system new_status in
+  let new_camera = adjust camera new_status in
   let new_time = Unix.gettimeofday () in
   let time_left = seconds_per_frame -. new_time +. time in
   if time_left > 0. then Unix.sleepf time_left;

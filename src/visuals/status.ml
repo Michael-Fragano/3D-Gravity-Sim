@@ -25,8 +25,21 @@ let default () =
         ('p', Idle);
         ('d', Idle);
         ('q', Idle);
-        ('s', Idle);
         ('w', Idle);
+        ('a', Idle);
+        ('s', Idle);
+        ('d', Idle);
+        (' ', Idle);
+        ('z', Idle);
+        ('i', Idle);
+        ('j', Idle);
+        ('k', Idle);
+        ('l', Idle);
+        ('u', Idle);
+        ('o', Idle);
+        ('g', Idle);
+        ('1', Idle);
+        ('2', Idle);
       ];
     (* we can add any number of other keys here ^ *)
     paused = false;
