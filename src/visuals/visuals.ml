@@ -74,7 +74,7 @@ let rec draw_bodies camera clear bodies =
       if (y > maxr) || (x > maxr) then
         draw_bodies camera clear t
       else
-        fill_circle (int_of_float ((400. *.  (x /. maxr)) +. 400.)) (int_of_float ((400. *.  (y /. maxr)) +. 400.)) (int_of_float (( (800. /. Camera.camfov camera) /. (sqrt ((Gravity.px rpos ** 2. ) +.(Gravity.py rpos ** 2. ) +. (Gravity.pz rpos ** 2. ) ))) *. Gravity.rad h ));
+        fill_circle (int_of_float ((400. *.  (x /. maxr)) +. 400.)) (int_of_float ((300. *.  (y /. maxr)) +. 300.)) (int_of_float (( (800. /. Camera.camfov camera) /. (sqrt ((Gravity.px rpos ** 2. ) +.(Gravity.py rpos ** 2. ) +. (Gravity.pz rpos ** 2. ) ))) *. Gravity.rad h ));
           draw_bodies camera clear t)
 
 let clear_screen camera system status =
